@@ -1,0 +1,105 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    CHAR
+    COMILL
+    DOT
+    DOTS
+    EMARK
+    GUION
+    LCORCH
+    LLLAVE
+    PLUS
+    PLUSES
+    QMARK
+    RCORCH
+    RLLAVE
+    SLASH
+
+Grammar
+
+Rule 0     S' -> expr
+Rule 1     expr -> LPAREN expr RPAREN expr
+Rule 2     expr -> <empty>
+
+Terminals, with rules where they appear
+
+CHAR                 : 
+COMILL               : 
+DOT                  : 
+DOTS                 : 
+EMARK                : 
+GUION                : 
+LCORCH               : 
+LLLAVE               : 
+LPAREN               : 1
+PLUS                 : 
+PLUSES               : 
+QMARK                : 
+RCORCH               : 
+RLLAVE               : 
+RPAREN               : 1
+SLASH                : 
+error                : 
+
+Nonterminals, with rules where they appear
+
+expr                 : 1 1 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . expr
+    (1) expr -> . LPAREN expr RPAREN expr
+    (2) expr -> .
+
+    LPAREN          shift and go to state 2
+    $end            reduce using rule 2 (expr -> .)
+
+    expr                           shift and go to state 1
+
+state 1
+
+    (0) S' -> expr .
+
+
+
+state 2
+
+    (1) expr -> LPAREN . expr RPAREN expr
+    (1) expr -> . LPAREN expr RPAREN expr
+    (2) expr -> .
+
+    LPAREN          shift and go to state 2
+    RPAREN          reduce using rule 2 (expr -> .)
+
+    expr                           shift and go to state 3
+
+state 3
+
+    (1) expr -> LPAREN expr . RPAREN expr
+
+    RPAREN          shift and go to state 4
+
+
+state 4
+
+    (1) expr -> LPAREN expr RPAREN . expr
+    (1) expr -> . LPAREN expr RPAREN expr
+    (2) expr -> .
+
+    LPAREN          shift and go to state 2
+    $end            reduce using rule 2 (expr -> .)
+    RPAREN          reduce using rule 2 (expr -> .)
+
+    expr                           shift and go to state 5
+
+state 5
+
+    (1) expr -> LPAREN expr RPAREN expr .
+
+    $end            reduce using rule 1 (expr -> LPAREN expr RPAREN expr .)
+    RPAREN          reduce using rule 1 (expr -> LPAREN expr RPAREN expr .)
+
