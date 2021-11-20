@@ -6,7 +6,7 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'CHAR COMILL DOT DOTS EMARK GUION LCORCH LLLAVE LPAREN PLUS PLUSES QMARK RCORCH RLLAVE RPAREN SLASHexpr : LPAREN expr RPAREN exprexpr : '
+_lr_signature = 'DESCRIPTOR DOT DOTS JUGADA LLLAVE LPAREN NUM RESULTADO RLLAVE RPAREN SPACE STRINGexpr : LPAREN expr RPAREN exprexpr : '
     
 _lr_action_items = {'LPAREN':([0,2,4,],[2,2,2,]),'$end':([0,1,4,5,],[-2,0,-2,-1,]),'RPAREN':([2,3,4,5,],[-2,4,-2,-1,]),}
 
@@ -27,6 +27,6 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> expr","S'",1,None,None,None),
-  ('expr -> LPAREN expr RPAREN expr','expr',4,'p_expression_concat','pgn.py',44),
-  ('expr -> <empty>','expr',0,'p_expression_lambda','pgn.py',48),
+  ('expr -> LPAREN expr RPAREN expr','expr',4,'p_expression_concat','pgn.py',39),
+  ('expr -> <empty>','expr',0,'p_expression_lambda','pgn.py',43),
 ]
