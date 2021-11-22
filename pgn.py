@@ -19,7 +19,7 @@ t_NUM           = r'[1-9][0-9]*'
 t_STRING        = r'[a-zA-ZñÑáéíóúÁÉÍÓÚ\-!,’´]+'
 t_JUGADA        = r'([PNBRQK]?[a-h]?[1-8]?x?[a-h][1-8](\+|\+\+)?|O-O|O-O-O)(!|\?)?'
 t_DESCRIPTOR    = r'\[[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+\ "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ\.\?\ -]+"\]'
-t_RESULTADO     = r'0-1|1-0|1\/2-1\/2'
+t_RESULTADO     = r'0\-1|1\-0|1\/2\-1\/2'
 t_SPACE         = r'\ '
 
 # Ignored characters
@@ -50,13 +50,13 @@ T -> (STRING | NUM | DOT | JUGADA | SPACE)*
 
 S -> (DESCRIPTOR+ P)+
 P -> J+
-J -> B (Ns | C RESULTADO | RESULTADO)
+J -> B (Ns | C SPACE RESULTADO | RESULTADO)
 Ns -> N (Cs | RESULTADO | .)
-Cs -> C (SPACE | RESULTADO)
+Cs -> C SPACE RESULTADO?
 N -> (C NUM DOTS SPACE)? JUGADA SPACE
 B -> NUM DOT SPACE JUGADA SPACE
 C -> {T C?} | (T C?)
-T -> (STRING | NUM | DOT | JUGADA | SPACE)+
+T -> (STRING | NUM | DOT | JUGADA | SPACE | DOTS)+
 
 ############################ Gramática derivada
 
@@ -70,17 +70,17 @@ P  -> J P1 .
 P1 -> P | . 
 J  -> B J1 .
 B  -> NUM DOT SPACE JUGADA SPACE .
-J1 -> Ns | C RESULTADO | RESULTADO .
+J1 -> Ns | C SPACE RESULTADO | RESULTADO .
 Ns -> N N1 .
 N1 -> Cs | RESULTADO | .
-Cs -> C C2 .
-C2 -> SPACE | RESULTADO .
+Cs -> C SPACE C2 .                
+C2 -> RESULTADO | .               
 N  -> N2 JUGADA SPACE .
 N2 -> C NUM DOTS SPACE | .
 C  -> { T C1 } | ( T C1 ) .
 C1 -> C | .
 T  -> T1 T | T1 .
-T1 -> STRING | NUM | DOT | JUGADA | SPACE .
+T1 -> STRING | NUM | DOT | JUGADA | SPACE | DOTS .
 
 # Primera iteración
 
@@ -109,16 +109,149 @@ CP -> (T CL) | λ
 CL -> {T CP} | λ
 """
 
-def p_start_simple(p):
-    'start : desc part'
+# S  -> D P S1 .
+def p_start(p):
+    'start : desc part start1'
 
-def p_start_multiple(p):
-    'start : desc part start'
-    
-    
-def p_expression_lambda(p):
-    'expr : '
-    p[0] = 0
+# S1 -> S 
+def p_start1_cont(p):
+    'start1 : start'
+
+# S1 -> .
+def p_start1_lambda(p):
+    'start1 : '
+
+# D  -> DESCRIPTOR D1 .
+def p_descriptor(p):
+    'desc : DESCRIPTOR desc1'
+
+# D1 -> D 
+def p_descriptor1_cont(p):
+    'desc1 : desc'
+
+# D1 -> .
+def p_descriptor1_lambda(p):
+    'desc1 : '
+
+# P  -> J P1 .    
+def p_partida(p):
+    'part : jug part1'
+
+# P1 -> P
+def p_partida1_cont(p):
+    'part1 : part'
+
+# P1 -> . 
+def p_partida1_lambda(p):
+    'part1 : '
+
+# J  -> B J1 .
+def p_jugada(p):
+    'jug : blanca jug1'
+
+# B  -> NUM DOT SPACE JUGADA SPACE .
+def p_blancas(p):
+    'blanca : NUM DOT SPACE JUGADA SPACE'
+
+# J1 -> Ns .
+def p_jugada1_empieza_negras(p):
+    'jug1 : negras'
+
+# J1 -> C SPACE RESULTADO 
+def p_jugada1_empieza_comentario(p):
+    'jug1 : comentario SPACE RESULTADO'
+
+# J1 -> RESULTADO 
+def p_jugada1_termina(p):
+    'jug1 : RESULTADO'
+
+# Ns -> N N1 .
+def p_negras(p):
+    'negras : negra negra1'
+
+# N1 -> Cs
+def p_negra1_empieza_comentario(p):
+    'negra1 : comentarios'
+
+# N1 -> RESULTADO
+def p_negra1_termina(p):
+    'negra1 : RESULTADO'
+
+# N1 -> .
+def p_negra1_lambda(p):
+    'negra1 : '
+
+# Cs -> C SPACE C2 .
+def p_comentarios(p):
+    'comentarios : comentario SPACE comentario2'
+
+# C2 -> RESULTADO .
+def p_comentario2_termina(p):
+    'comentario2 : RESULTADO'
+
+# C2 -> .
+def p_comentario2_termina(p):
+    'comentario2 : '
+
+# N  -> N2 JUGADA SPACE .
+def p_negra(p):
+    'negra : negra2 JUGADA SPACE'
+
+# N2 -> C NUM DOTS SPACE
+def p_negra2_ocurre(p):
+    'negra2 : comentario NUM DOTS SPACE'
+
+# N2 -> .
+def p_negra2_lambda(p):
+    'negra2 : '
+
+# C  -> { T C1 }
+def p_comentario_llaves(p):
+    'comentario : LLLAVE texto comentario1 RLLAVE'
+
+# C  -> ( T C1 ) .
+def p_comentario_parentesis(p):
+    'comentario : LPAREN texto comentario1 RPAREN'
+
+# C1 -> C | .
+def p_comentario1_comentario(p):
+    'comentario1 : comentario'
+
+# C1 -> C | .
+def p_comentario1_lambda(p):
+    'comentario1 : '
+
+# T  -> T1 T
+def p_texto_cont(p):
+    'texto : texto1 texto'
+
+# T  -> T1 .
+def p_texto_termina(p):
+    'texto : texto1'
+
+# T1 -> STRING
+def p_texto1_string(p):
+    'texto1 : STRING'
+
+# T1 -> NUM
+def p_texto1_numerico(p):
+    'texto1 : NUM'
+
+# T1 -> DOT .
+def p_texto1_punto(p):
+    'texto1 : DOT'
+
+# T1 -> DOTS .
+def p_texto1_puntos(p):
+    'texto1 : DOTS'
+
+# T1 -> JUGADA .
+def p_texto1_jugada(p):
+    'texto1 : JUGADA'
+
+# T1 -> SPACE .
+def p_texto1_espacio(p):
+    'texto1 : SPACE'
 
 def p_error(p):
     raise Exception(f"Parser: Syntax error at {p.value!r}")
@@ -128,11 +261,12 @@ parser = yacc.yacc()
 # Test it out
 data = '''
 [a "b"]
-1. e4 d5 {defensa escandinava (es com´un 2. exd5 Da5 {no es com´un 2... c6})} 1/2-1/2
-'''
+1. e4 d5 {defensa escandinava (es com´un 2. exd5 Da5 {no es com´un 2... c6})} 1/2-1/2'''
 
 # Give the lexer some input
 lexer.input(data)
+
+print("LEXER", end="\n\n")
 
 # Tokenize
 while True:
@@ -140,3 +274,7 @@ while True:
     if not tok: 
         break      # No more input
     print(f'{tok.type}({tok.value})', end = ' ')
+
+print("\n\nPARSER", end="\n\n")
+
+print(parser.parse(data))
