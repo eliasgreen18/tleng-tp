@@ -18,7 +18,7 @@ t_DOT           = r'\.'
 t_DOTS          = r'\.\.\.'
 t_NUM           = r'[1-9][0-9]*'
 t_STRING        = r'[a-zA-ZñÑáéíóúÁÉÍÓÚ\-!,’´~]+'
-t_JUGADA        = r'([PNBRQK]?[a-h]?[1-8]?x?[a-h][1-8]\+?\+?|O-O|O-O-O)(!|\?)?'
+t_JUGADA        = r'([PNBRQK]?[a-h]?[1-8]?x?[a-h][1-8]\+?\+?|O-O(-O)?)(!|\?)?'
 t_DESCRIPTOR    = r'\[[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ~]+\ "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ\.\?\ -~]+"\]'
 t_RESULTADO     = r'0\-1|1\-0|1\/2\-1\/2'
 t_SPACE         = r'\ '
@@ -73,7 +73,7 @@ CL -> { T [C4 | }] .
 CP -> ( T [C5 | )] .
 C4 -> C [} | T }] .
 C5 -> C [) | T )] .
-T  -> (STRING | NUM | DOT | JUGADA | SPACE )+
+T  -> (STRING | NUM | DOT | JUGADA | SPACE | DOTS)+
 
 ############################ Gramática derivada
 
@@ -94,7 +94,7 @@ Cs -> C SPACE C2 .
 C2 -> RESULTADO | .               
 N  -> N2 JUGADA SPACE .
 N2 -> C SPACE NUM DOTS SPACE | .
-C  -> CL | { C T } | CP | ( C T ) .
+C  -> CL | { C T } | CP | ( C T ) .  
 CL -> { T C6 .
 C6 -> C4 | } .
 CP -> ( T C7 .
@@ -104,11 +104,21 @@ C8 -> } | T } .
 C5 -> C C9 .
 C9 -> ) | T ) .
 T  -> T1 T | T1 .
-T1 -> STRING | NUM | DOT | JUGADA | SPACE .
+T1 -> STRING | NUM | DOT | JUGADA | SPACE | DOTS .
 
- - {T} -> if jugada_captura(T) then 1 else 0
- - (T) -> if jugada_captura then 1 else 0
- - {C T} -> if c.value > 0 then c.value + 1 else jugada_captura(T)
+- Recordar chequear los números 
+
+ - {T} -> jugada_captura(T) then 0 else 1
+ - (T) -> jugada_captura(T) then 0 else 1
+ - {C T} -> if C.nivel_anidamiento > 0 then C.nivel_anidamiento + 1 else jugada_captura(T)
+( {} ... {} )
+
+   r - - > 0, 1, 2, 3 ...
+   |
+   | r - > C.value + 1 or ¿captura en T?
+   | |
+   v v
+ { C T }
 
 # Primera iteración
 
@@ -318,6 +328,10 @@ def p_texto1_numerico(p):
 def p_texto1_punto(p):
     'texto1 : DOT'
 
+# T1 -> DOTS .
+def p_texto1_puntos(p):
+    'texto1 : DOTS'
+
 # T1 -> JUGADA .
 def p_texto1_jugada(p):
     'texto1 : JUGADA'
@@ -357,6 +371,25 @@ data = '''
 [4e "ws20"]
 
 1. Bxd1 Pa6 0-1
+
+[a "b"]
+
+1. e4 d5 {defensa escandinava (es com´un 2. exd5 Da5 {no es com´un 2... c6})} 1/2-1/2
+
+[Event "Mannheim"]
+[Site "Mannheim GER"]
+[Date "1914.08.01"]
+[EventDate "1914.07.20"]
+[Round "11"]
+[Result "1-0"]
+[White "Alexander Alekhine"]
+[Black "Hans Fahrni"]
+[ECO "C13"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "45"]
+
+1. e4 {Notes by Richard Reti} 1... e6 2. d4 d5 3. Nc3 Nf6 4. Bg5 Be7 5. e5 Nfd7 6. h4 {This ingenious method of play which has subsequently been adopted by all modern masters is characteristic of Alekhine’s style.} 6... Bxg5 7. hxg5 Qxg5 8. Nh3 {! The short-stepping knight is always brought as near as possible to the actual battle field. Therefore White does not make the plausible move 8 Nf3 but 8 Nh3 so as to get the knight to f4.} 8... Qe7 9. Nf4 Nf8 10. Qg4 f5 {The only move. Not only was 11 Qxg7 threatened but also Nxd5.} 11. exf6 gxf6 12. O-O-O {He again threatens Nxd5.} 12... c6 13. Re1 Kd8 14. Rh6 e5 15. Qh4 Nbd7 16. Bd3 e4 17. Qg3 Qf7 {Forced - the sacrifice of the knight at d5 was threatened and after 17...Qd6 18 Bxe4 dxe4 19 Rxe4 and 20 Qg7 wins.} 18. Bxe4 dxe4 19. Nxe4 Rg8 20. Qa3 {Here, as so often happens, a surprising move and one difficult to have foreseen, forms the kernel of an apparently simple Alekhine combination.} 20... Qg7 {After 20.Qe7 21.Qa5+ b6 22.Qc3 would follow.} 21. Nd6 Nb6 22. Ne8 Qf7 {White mates in three moves.} 23. Qd6+ 1-0
 '''
 
 # Give the lexer some input
