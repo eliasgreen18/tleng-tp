@@ -92,29 +92,20 @@ T  -> (STRING | NUM | DOT | JUGADA | SPACE | DOTS)+
 
 # Cuarta iteración
 
-S  -> D P S1 .
-S1 -> S | .
-D  -> DESCRIPTOR D1 .
-D1 -> D | .
-P  -> J P1 .
-P1 -> P | . 
-J  -> B J1 .
+S  -> D P S | D P .
+D  -> DESCRIPTOR D | DESCRIPTOR .
+P  -> J P | J .
+J  -> B Ns | B C SPACE RESULTADO | B RESULTADO .
 B  -> NUM DOT SPACE JUGADA SPACE .
-J1 -> Ns | C SPACE RESULTADO | RESULTADO .
-Ns -> N N1 .
-N1 -> Cs | RESULTADO | .
-Cs -> C SPACE C2 .                
-C2 -> RESULTADO | .               
-N  -> N2 JUGADA SPACE .
-N2 -> C SPACE NUM DOTS SPACE | .
-C  -> { C1 } | ( C1 ) .
-C1 -> CT | CC | C1 C1 .
-CT -> T C4 .
-C4 -> C | . 
-CC -> C C3
-C3 -> T | .
-T  -> T1 T | T1 .
-T1 -> STRING | NUM | DOT | JUGADA | SPACE | DOTS .
+Ns -> N Cs | N RESULTADO | N .
+Cs -> C SPACE RESULTADO | C SPACE .                        
+.N  -> C SPACE NUM DOTS SPACE JUGADA SPACE | JUGADA SPACE .
+.C  -> { Cu } | ( Cu ) . 
+.Cu -> CT | CC .
+.CT -> T CC | T . 
+.CC -> C T | C .
+.T  -> T1 T | T1 .
+.T1 -> STRING | NUM | DOT | JUGADA | SPACE | DOTS .
 
 # Segunda iteración
 
@@ -191,179 +182,173 @@ class PGN():
         self.nesting = nesting
         self.number  = number
 
-# S  -> D P S1 .
+class Comentario():
+    def __init__(self, nesting, capture):
+        self.nesting = nesting
+        self.capture = capture
+
+# S  -> D P S .
+def p_start_conc(p):
+    'start : desc part start'
+    p[0] = max(p[2].nesting, p[3])
+
+# S  -> D P .
 def p_start(p):
-    'start : desc part start1'
-    p[0] = max(p[2].nesting, p[3].nesting)
+    'start : desc part '
+    p[0] = p[2].nesting
 
-# S1 -> S 
-def p_start1_cont(p):
-    'start1 : start'
-    p[0] = p[1].nesting
+# D  -> DESCRIPTOR D .
+def p_descriptor_conc(p):
+    'desc : DESCRIPTOR desc'
 
-# S1 -> .
-def p_start1_lambda(p):
-    'start1 : '
-    p[0] = 0
-
-# D  -> DESCRIPTOR D1 .
+# D  -> DESCRIPTOR  .
 def p_descriptor(p):
-    'desc : DESCRIPTOR desc1'
+    'desc : DESCRIPTOR '
 
-# D1 -> D 
-def p_descriptor1_cont(p):
-    'desc1 : desc'
+# P  -> J P . 
+def p_partida_conc(p):
+    'part : jug part'
+    p[0] = PGN(max(p[1].nesting, p[2].nesting),-1)
 
-# D1 -> .
-def p_descriptor1_lambda(p):
-    'desc1 : '
+# P  -> J .
+def p_partida_jugada(p):
+    'part : jug'
+    p[0] = p[1]
 
-# P  -> J P1 . 
-def p_partida(p):
-    'part : jug part1'
-    p[0] = max(p[1].nivel_anidamiento, p[2].nivel_anidamiento)
+# J  -> B Ns .
+def p_jugada_negras(p):
+    'jug : blanca negras'
+    p[0] = PGN(max(p[1].nesting, p[2].nesting),-1)
 
-# P1 -> P
-def p_partida1_cont(p):
-    'part1 : part'
-    p[0] = PGN(0,0,) if p[1].numerator == -1 else PGN(0,0,)
+# J  -> B C SPACE RESULTADO .
+def p_jugada_comentario(p):
+    'jug : blanca comentario SPACE RESULTADO'
+    p[0] = PGN(max(p[1].nesting, p[2].nesting),-1)
 
-# P1 -> . 
-def p_partida1_lambda(p):
-    'part1 : '
-    p[0] = PGN(0, 0, -1)
-
-# J  -> B J1 .
-def p_jugada(p):
-    'jug : blanca jug1'
+# J  -> B RESULTADO .
+def p_jugada_fin(p):
+    'jug : blanca RESULTADO'
+    p[0] = p[1]
 
 # B  -> NUM DOT SPACE JUGADA SPACE .
 def p_blancas(p):
     'blanca : NUM DOT SPACE JUGADA SPACE'
+    p[0] = PGN(0,-1)
 
-# J1 -> Ns .
-def p_jugada1_empieza_negras(p):
-    'jug1 : negras'
+# Ns -> N Cs .
+def p_negras_comentarios(p):
+    'negras : negra comentarios'
+    p[0] = PGN(max(p[1].nesting, p[2].nesting),-1)
 
-# J1 -> C SPACE RESULTADO 
-def p_jugada1_empieza_comentario(p):
-    'jug1 : comentario SPACE RESULTADO'
+# Ns -> N RESULTADO .
+def p_negras_resultado(p):
+    'negras : negra RESULTADO'
+    p[0] = p[1]
 
-# J1 -> RESULTADO 
-def p_jugada1_termina(p):
-    'jug1 : RESULTADO'
-
-# Ns -> N N1 .
+# Ns -> N .
 def p_negras(p):
-    'negras : negra negra1'
+    'negras : negra'
+    p[0] = p[1]
 
-# N1 -> Cs
-def p_negra1_empieza_comentario(p):
-    'negra1 : comentarios'
+# Cs -> C SPACE RESULTADO .
+def p_comentarios_resultado(p):
+    'comentarios : comentario SPACE RESULTADO'
+    p[0] = PGN(p[1],-1)
 
-# N1 -> RESULTADO
-def p_negra1_termina(p):
-    'negra1 : RESULTADO'
-
-# N1 -> .
-def p_negra1_lambda(p):
-    'negra1 : '
-
-# Cs -> C SPACE C2 .
+# Cs -> C SPACE .
 def p_comentarios(p):
-    'comentarios : comentario SPACE comentario2'
+    'comentarios : comentario SPACE'
+    p[0] = PGN(p[1],-1)
 
-# C2 -> RESULTADO .
-def p_comentario2_termina(p):
-    'comentario2 : RESULTADO'
+# N  -> C SPACE NUM DOTS SPACE JUGADA SPACE .
+def p_negra_comentario(p):
+    'negra : comentario SPACE NUM DOTS SPACE JUGADA SPACE'
+    p[0] = PGN(p[1],-1)
 
-# C2 -> .
-def p_comentario2_lambda(p):
-    'comentario2 : '
-
-# N  -> N2 JUGADA SPACE .
+# N  -> JUGADA SPACE .
 def p_negra(p):
-    'negra : negra2 JUGADA SPACE'
+    'negra : JUGADA SPACE'
+    p[0] = PGN(0,-1)
 
-# N2 -> C SPACE NUM DOTS SPACE
-def p_negra2_ocurre(p):
-    'negra2 : comentario SPACE NUM DOTS SPACE'
-
-# N2 -> .
-def p_negra2_lambda(p):
-    'negra2 : '
-
-# C  -> { C1 } .
+# C  -> { Cu } .
 def p_comentario_llave_cuerpo(p):
     'comentario : LLLAVE cuerpo RLLAVE'
+    p[0] = p[2].nesting + 1 if p[2].nesting > 0 else (0 if p[2].capture else 1)
 
-# C  -> ( C1 ) .
+# C  -> ( Cu ) .
 def p_comentario_paren_cuerpo(p):
-    'comentario : LLPAREN cuerpo RPAREN'
+    'comentario : LPAREN cuerpo RPAREN'
+    p[0] = p[2].nesting + 1 if p[2].nesting > 0 else (0 if p[2].capture else 1)
 
-# C1 -> CT .
-def p_texto_cuerpo(p):
-    'cuerpo : texto_cuerpo'
+# Cu -> CT .
+def p_cuerpo_text(p):
+    'cuerpo : comentario_texto'
+    p[0] = p[1]
 
-# C1  -> CC .
-def p_cuerpo_texto(p):
-    'cuerpo : cuerpo_texto'
+# Cu  -> CC .
+def p_cuerpo_comentario(p):
+    'cuerpo : comentario_comentario'
+    p[0] = p[1] 
 
+# CT -> T CC . 
+def p_comentario_texto_comentario(p):
+    'comentario_texto : texto comentario_comentario'
+    p[0] = Comentario(p[2].nesting, p[1] or p[2].capture)
 
-# CT -> T C4 .
-def p_comentario_cuerpo_texto(p):
-    'texto_cuerpo : texto comentario4'
-# C4 -> C . 
-def p_comentario4_comentario(p):
-    'comentario4 : comentario'
-# C4 -> .
-def p_comentario4_lambda(p):
-    'comentario4 : '
+# CT -> T . 
+def p_comentario_texto_texto(p):
+    'comentario_texto : texto'
+    p[0] = Comentario(0, p[1])
 
-# CC -> C C3
-def p_comentario_comentario3(p):
-    'cuerpo : comentario comentario3'
+# CC -> C T .
+def p_comentario_comentario_texto(p):
+    'comentario_comentario : comentario texto'
+    p[0] = Comentario(p[1], p[2])
 
-# C3 -> T | .
-def p_comentario_comentario3(p):
-    'comentario3 : texto'
-
-def p_comentario_comentario3(p):
-    'comentario3 : '
+# CC -> C .
+def p_comentario_comentario(p):
+    'comentario_comentario : comentario'
+    p[0] = Comentario(p[1], False)
 
 # T  -> T1 T
 def p_texto_cont(p):
     'texto : texto1 texto'
+    p[0] = p[1] or p[2]
 
 # T  -> T1 .
 def p_texto_termina(p):
     'texto : texto1'
+    p[0] = p[1]
 
 # T1 -> STRING
 def p_texto1_string(p):
     'texto1 : STRING'
+    p[0] = False
 
 # T1 -> NUM
 def p_texto1_numerico(p):
     'texto1 : NUM'
+    p[0] = False
 
 # T1 -> DOT .
 def p_texto1_punto(p):
     'texto1 : DOT'
-    p[0] = PGN(0, 0, -1)
+    p[0] = False
+
 # T1 -> DOTS .
 def p_texto1_puntos(p):
     'texto1 : DOTS'
-    p[0] = PGN(0, 0, -1)
+    p[0] = False
     
 # T1 -> JUGADA .
 def p_texto1_jugada(p):
     'texto1 : JUGADA'
-    p[0] = PGN(0, 0, -1)
+    p[0] = "x" in p[1]
     
 # T1 -> SPACE .
 def p_texto1_espacio(p):
     'texto1 : SPACE'
+    p[0] = False
     
 def p_error(p):
     raise Exception(f"Parser: Syntax error at {p.value!r}")
