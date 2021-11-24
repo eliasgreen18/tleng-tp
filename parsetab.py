@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'DESCRIPTOR DOT DOTS JUGADA LLLAVE LPAREN NUM RESULTADO RLLAVE RPAREN SPACE STRINGstart : desc part start1start1 : startstart1 : desc : DESCRIPTOR desc1desc1 : descdesc1 : part : jug part1part1 : partpart1 : jug : blanca jug1blanca : NUM DOT SPACE JUGADA SPACEjug1 : negrasjug1 : comentario SPACE RESULTADOjug1 : RESULTADOnegras : negra negra1negra1 : comentariosnegra1 : RESULTADOnegra1 : comentarios : comentario SPACE comentario2comentario2 : negra : negra2 JUGADA SPACEnegra2 : comentario NUM DOTS SPACEnegra2 : comentario : LLLAVE texto comentario1 RLLAVEcomentario : LPAREN texto comentario1 RPARENcomentario1 : comentariocomentario1 : texto : texto1 textotexto : texto1texto1 : STRINGtexto1 : NUMtexto1 : DOTtexto1 : DOTStexto1 : JUGADAtexto1 : SPACE'
+_lr_signature = 'LPAREN RPARENstart : exprexpr : LPAREN expr RPAREN exprexpr : '
     
-_lr_action_items = {'DESCRIPTOR':([0,3,4,5,12,13,14,15,17,18,25,26,27,40,42,47,50,],[3,3,3,-9,-7,-8,-10,-12,-14,-18,-15,-16,-17,-13,-20,-21,-19,]),'$end':([1,4,5,10,11,12,13,14,15,17,18,25,26,27,40,42,47,50,],[0,-3,-9,-1,-2,-7,-8,-10,-12,-14,-18,-15,-16,-17,-13,-20,-21,-19,]),'NUM':([2,3,5,8,9,14,15,16,17,18,19,20,25,26,27,30,31,32,33,34,35,36,40,42,47,50,51,52,],[7,-6,7,-4,-5,-10,-12,24,-14,-18,32,32,-15,-16,-17,32,-30,-31,-32,-33,-34,-35,-13,-20,-21,-19,-24,-25,]),'RESULTADO':([6,18,23,47,53,],[17,27,40,-21,-11,]),'LLLAVE':([6,18,29,30,31,32,33,34,35,36,37,45,47,53,],[19,19,19,-29,-30,-31,-32,-33,-34,-35,19,-28,-21,-11,]),'LPAREN':([6,18,29,30,31,32,33,34,35,36,37,45,47,53,],[20,20,20,-29,-30,-31,-32,-33,-34,-35,20,-28,-21,-11,]),'JUGADA':([6,19,20,21,30,31,32,33,34,35,36,39,49,53,],[-23,35,35,38,35,-30,-31,-32,-33,-34,-35,48,-22,-11,]),'DOT':([7,19,20,30,31,32,33,34,35,36,],[22,33,33,33,-30,-31,-32,-33,-34,-35,]),'SPACE':([16,19,20,22,28,30,31,32,33,34,35,36,38,41,48,51,52,],[23,36,36,39,42,36,-30,-31,-32,-33,-34,-35,47,49,53,-24,-25,]),'STRING':([19,20,30,31,32,33,34,35,36,],[31,31,31,-30,-31,-32,-33,-34,-35,]),'DOTS':([19,20,24,30,31,32,33,34,35,36,],[34,34,41,34,-30,-31,-32,-33,-34,-35,]),'RLLAVE':([29,30,31,32,33,34,35,36,43,44,45,51,52,],[-27,-29,-30,-31,-32,-33,-34,-35,51,-26,-28,-24,-25,]),'RPAREN':([30,31,32,33,34,35,36,37,44,45,46,51,52,],[-29,-30,-31,-32,-33,-34,-35,-27,-26,-28,52,-24,-25,]),}
+_lr_action_items = {'LPAREN':([0,3,5,],[3,3,3,]),'$end':([0,1,2,5,6,],[-3,0,-1,-3,-2,]),'RPAREN':([3,4,5,6,],[-3,5,-3,-2,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'start':([0,4,],[1,11,]),'desc':([0,3,4,],[2,9,2,]),'part':([2,5,],[4,13,]),'jug':([2,5,],[5,5,]),'blanca':([2,5,],[6,6,]),'desc1':([3,],[8,]),'start1':([4,],[10,]),'part1':([5,],[12,]),'jug1':([6,],[14,]),'negras':([6,],[15,]),'comentario':([6,18,29,37,],[16,28,44,44,]),'negra':([6,],[18,]),'negra2':([6,],[21,]),'negra1':([18,],[25,]),'comentarios':([18,],[26,]),'texto':([19,20,30,],[29,37,45,]),'texto1':([19,20,30,],[30,30,30,]),'comentario1':([29,37,],[43,46,]),'comentario2':([42,],[50,]),}
+_lr_goto_items = {'start':([0,],[1,]),'expr':([0,3,5,],[2,4,6,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,39 +27,7 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> start","S'",1,None,None,None),
-  ('start -> desc part start1','start',3,'p_start','pgn.py',114),
-  ('start1 -> start','start1',1,'p_start1_cont','pgn.py',118),
-  ('start1 -> <empty>','start1',0,'p_start1_lambda','pgn.py',122),
-  ('desc -> DESCRIPTOR desc1','desc',2,'p_descriptor','pgn.py',126),
-  ('desc1 -> desc','desc1',1,'p_descriptor1_cont','pgn.py',130),
-  ('desc1 -> <empty>','desc1',0,'p_descriptor1_lambda','pgn.py',134),
-  ('part -> jug part1','part',2,'p_partida','pgn.py',138),
-  ('part1 -> part','part1',1,'p_partida1_cont','pgn.py',142),
-  ('part1 -> <empty>','part1',0,'p_partida1_lambda','pgn.py',146),
-  ('jug -> blanca jug1','jug',2,'p_jugada','pgn.py',150),
-  ('blanca -> NUM DOT SPACE JUGADA SPACE','blanca',5,'p_blancas','pgn.py',154),
-  ('jug1 -> negras','jug1',1,'p_jugada1_empieza_negras','pgn.py',158),
-  ('jug1 -> comentario SPACE RESULTADO','jug1',3,'p_jugada1_empieza_comentario','pgn.py',162),
-  ('jug1 -> RESULTADO','jug1',1,'p_jugada1_termina','pgn.py',166),
-  ('negras -> negra negra1','negras',2,'p_negras','pgn.py',170),
-  ('negra1 -> comentarios','negra1',1,'p_negra1_empieza_comentario','pgn.py',174),
-  ('negra1 -> RESULTADO','negra1',1,'p_negra1_termina','pgn.py',178),
-  ('negra1 -> <empty>','negra1',0,'p_negra1_lambda','pgn.py',182),
-  ('comentarios -> comentario SPACE comentario2','comentarios',3,'p_comentarios','pgn.py',186),
-  ('comentario2 -> <empty>','comentario2',0,'p_comentario2_termina','pgn.py',194),
-  ('negra -> negra2 JUGADA SPACE','negra',3,'p_negra','pgn.py',198),
-  ('negra2 -> comentario NUM DOTS SPACE','negra2',4,'p_negra2_ocurre','pgn.py',202),
-  ('negra2 -> <empty>','negra2',0,'p_negra2_lambda','pgn.py',206),
-  ('comentario -> LLLAVE texto comentario1 RLLAVE','comentario',4,'p_comentario_llaves','pgn.py',210),
-  ('comentario -> LPAREN texto comentario1 RPAREN','comentario',4,'p_comentario_parentesis','pgn.py',214),
-  ('comentario1 -> comentario','comentario1',1,'p_comentario1_comentario','pgn.py',218),
-  ('comentario1 -> <empty>','comentario1',0,'p_comentario1_lambda','pgn.py',222),
-  ('texto -> texto1 texto','texto',2,'p_texto_cont','pgn.py',226),
-  ('texto -> texto1','texto',1,'p_texto_termina','pgn.py',230),
-  ('texto1 -> STRING','texto1',1,'p_texto1_string','pgn.py',234),
-  ('texto1 -> NUM','texto1',1,'p_texto1_numerico','pgn.py',238),
-  ('texto1 -> DOT','texto1',1,'p_texto1_punto','pgn.py',242),
-  ('texto1 -> DOTS','texto1',1,'p_texto1_puntos','pgn.py',246),
-  ('texto1 -> JUGADA','texto1',1,'p_texto1_jugada','pgn.py',250),
-  ('texto1 -> SPACE','texto1',1,'p_texto1_espacio','pgn.py',254),
+  ('start -> expr','start',1,'p_start','parentesis-anidados.py',27),
+  ('expr -> LPAREN expr RPAREN expr','expr',4,'p_expression_concat','parentesis-anidados.py',31),
+  ('expr -> <empty>','expr',0,'p_expression_lambda','parentesis-anidados.py',35),
 ]

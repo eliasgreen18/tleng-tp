@@ -22,14 +22,23 @@ def t_error(t):
 
 # Build the lexer
 lexer = lex.lex()
+class Parentesis():
+    def __init__(self, pepe, panoli):
+        self.pepe   = pepe
+        self.panoli = panoli
+
+def p_start(p):
+    'start : expr'
+    p[0] = p[1].pepe
 
 def p_expression_concat(p):
     'expr : LPAREN expr RPAREN expr'
-    p[0] = max(p[2] + 1, p[4])
+    p[0] = Parentesis(max(p[2].pepe + 1, p[4].pepe), 0)
     
 def p_expression_lambda(p):
     'expr : '
-    p[0] = 0
+    p[0] = Parentesis(0, 0)
+    
 
 def p_error(p):
     raise Exception(f"Parser: Syntax error at {p.value!r}")

@@ -92,13 +92,16 @@ T  -> (STRING | NUM | DOT | JUGADA | SPACE | DOTS)+
 
 # Cuarta iteración
 
-S  -> D P S | D P .
+P -> J P | J .
+J -> NUM .... NUM... .....
+
+S  -> D P S | D P .                 {  }
 D  -> DESCRIPTOR D | DESCRIPTOR .
 P  -> J P | J .
 J  -> B Ns | B C SPACE RESULTADO | B RESULTADO .
 B  -> NUM DOT SPACE JUGADA SPACE .
-Ns -> N Cs | N RESULTADO | N .
-Cs -> C SPACE RESULTADO | C SPACE .                        
+- Ns -> N Cs | N RESULTADO | N .
+- Cs -> C SPACE RESULTADO | C SPACE .                        
 .N  -> C SPACE NUM DOTS SPACE JUGADA SPACE | JUGADA SPACE .
 .C  -> { Cu } | ( Cu ) . 
 .Cu -> CT | CC .
@@ -106,6 +109,16 @@ Cs -> C SPACE RESULTADO | C SPACE .
 .CC -> C T | C .
 .T  -> T1 T | T1 .
 .T1 -> STRING | NUM | DOT | JUGADA | SPACE | DOTS .
+
+| atrib | tipo | sintetizado o heredado?
+| J.
+|
+|
+|
+|
+|
+|
+|
 
 # Segunda iteración
 
@@ -186,7 +199,11 @@ class Comentario():
     def __init__(self, nesting, capture):
         self.nesting = nesting
         self.capture = capture
-
+        
+def condition(expression):
+    if not expression:
+        raise Exception()
+    
 # S  -> D P S .
 def p_start_conc(p):
     'start : desc part start'
@@ -208,8 +225,9 @@ def p_descriptor(p):
 # P  -> J P . 
 def p_partida_conc(p):
     'part : jug part'
-    p[0] = PGN(max(p[1].nesting, p[2].nesting),-1)
-
+    condition(p[1].number == (p[2].number - 1))
+    p[0] = PGN(max(p[1].nesting, p[2].nesting), p[1].number)
+    
 # P  -> J .
 def p_partida_jugada(p):
     'part : jug'
@@ -218,12 +236,14 @@ def p_partida_jugada(p):
 # J  -> B Ns .
 def p_jugada_negras(p):
     'jug : blanca negras'
-    p[0] = PGN(max(p[1].nesting, p[2].nesting),-1)
+    if p[2].number != -1:
+        condition(p[1].number == p[2].number)
+    p[0] = PGN(max(p[1].nesting, p[2].nesting), p[1].number)
 
 # J  -> B C SPACE RESULTADO .
 def p_jugada_comentario(p):
     'jug : blanca comentario SPACE RESULTADO'
-    p[0] = PGN(max(p[1].nesting, p[2].nesting),-1)
+    p[0] = PGN(max(p[1].nesting, p[2].nesting), p[1].number)
 
 # J  -> B RESULTADO .
 def p_jugada_fin(p):
@@ -233,12 +253,13 @@ def p_jugada_fin(p):
 # B  -> NUM DOT SPACE JUGADA SPACE .
 def p_blancas(p):
     'blanca : NUM DOT SPACE JUGADA SPACE'
-    p[0] = PGN(0,-1)
+    condition(p[1].isnumeric())
+    p[0] = PGN(0, int(p[1]))
 
 # Ns -> N Cs .
 def p_negras_comentarios(p):
     'negras : negra comentarios'
-    p[0] = PGN(max(p[1].nesting, p[2].nesting),-1)
+    p[0] = PGN(max(p[1].nesting, p[2].nesting), p[1].number)
 
 # Ns -> N RESULTADO .
 def p_negras_resultado(p):
@@ -263,7 +284,8 @@ def p_comentarios(p):
 # N  -> C SPACE NUM DOTS SPACE JUGADA SPACE .
 def p_negra_comentario(p):
     'negra : comentario SPACE NUM DOTS SPACE JUGADA SPACE'
-    p[0] = PGN(p[1],-1)
+    condition(p[3].isnumeric())
+    p[0] = PGN(p[1], int(p[3]))
 
 # N  -> JUGADA SPACE .
 def p_negra(p):
