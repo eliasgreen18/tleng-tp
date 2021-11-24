@@ -207,11 +207,13 @@ def condition(expression):
 # S  -> D P S .
 def p_start_conc(p):
     'start : desc part start'
+    condition(p[2].number == 1)
     p[0] = max(p[2].nesting, p[3])
 
 # S  -> D P .
 def p_start(p):
     'start : desc part '
+    condition(p[2].number == 1)
     p[0] = p[2].nesting
 
 # D  -> DESCRIPTOR D .
