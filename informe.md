@@ -111,7 +111,15 @@ La salida arrojará un error o el valor de máximo anidamiento registrado entre 
 
 ## Conclusiones
 
-La principal dificultad del trabajo fue lograr entender cómo funcionaba la biblioteca `ply`. Creemos que hubiera sido más simple nuestro trabajo si hubiéramos contado con una clase de introducción.
+La principal dificultad del trabajo fue lograr entender cómo funcionaba la biblioteca `ply`. Creemos que hubiera sido más simple nuestro trabajo si hubiéramos contado con una clase introductoria para este tipo de herramientas. Para poder entender un poco más el uso de esta herramienta, primero realizamos una implementación de una gramática simple. Esta genera todas las posibles cadenas con parentesis anidados y balanceados (esto puede observarse en el archivo `parentesis-anidados.py`). 
+
+El siguiente conflicto encontrado, como mencionamos anteriormente, es el de encontrar los `tokens` adecuados para utilizar dentro del `lexer` y para definirlo realizamos un proceso iterativo. Basado en esto diseñamos una gramática _left-to-right rightmost derivation_(LR), válidandola con la herramienta ya mencionada [Grammophone](http://mdaines.github.io/grammophone/).
+
+Finalmente el último desafío a afrontar fue la generación de las reglas semánticas que conforman la gramática de atributos. Para esto, a nivel implementativo, trabajamos con dos estructuras `Comentario` y `PGN` que nos permitieron tener más de un valor almacenado. Además definimos la función `condition`, la cual presenta un comportamiento análogo a la utilizada en la práctica levantando una excepción en el caso de no satisfacer la condición evaluada.
+
+Algo a resaltar sobre los atributos utilizados en las reglas semánticas es que todos son de tipo _sintetizado_, esto indica que la gramática presentada es S-atribuida. Gracias a esto podemos asegurar qye el grafo de dependencias no va a presentar ciclos para ninguna cadena del lenguaje, implicando que todos los atributos van a poder ser calculados.
+
+Cómo trabajo a futuro podría proponerse un cambio dentro de la gramática que permita garantizar la alternancia entre comentarios que utilizen llaves y parentesis. Esto implicaría el cambio en las producciones utilizadas, agregando así mayor claridad sobre los comentarios utilizados dentro de una jugada. También sería posible obtener una mayor sobre la partida agregando o modificando las reglas semánticas existentes, por ejemplo: "máxima cantidad de jaques por archivo".
 
 ## Anexo
 
