@@ -53,7 +53,7 @@ t_DESCRIPTOR = r'\[[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ~]+\ "[a-zA-Z0-9ñÑáéí�
 t_RESULTADO  = r'0\-1|1\-0|1\/2\-1\/2'
 ```
 
-El _token_ `NUM`representa valores numéricos cuyo primer dígito no puede ser cero. 
+El _token_ `NUM` representa valores numéricos cuyo primer dígito no puede ser cero. 
 
 El de `JUGADA`, permite comenzar con la letra mayúscula que indica la pieza (P, N, B, R, Q, K) o no tener ninguno, en cuyo caso se interpreta como un peón. Luego aparecen las coordenadas opcionales de partida y el símbolo `x` que indica si la jugada representa una captura, a continuación las coordenadas de llegada que son obligatorias y un símbolo `+` o `++` que indica un jaque o jaque mate respectivamente. Otra opción es que la jugada constituya un enroque que puede representarse como `O-O-O` o `O-O`. Finalmente, cada jugada puede ser marcada como mala `?` o buena `!`.
 
@@ -111,7 +111,7 @@ La salida arrojará un error o el valor de máximo anidamiento registrado entre 
 
 ## Conclusiones
 
-La principal dificultad del trabajo fue lograr entender cómo funcionaba la biblioteca `ply`. Creemos que hubiera sido más simple nuestro trabajo si hubiéramos contado con una clase introductoria para este tipo de herramientas. Para poder entender un poco más el uso de esta herramienta, primero realizamos una implementación de una gramática simple. Esta genera todas las posibles cadenas con parentesis anidados y balanceados (esto puede observarse en el archivo `parentesis-anidados.py`). 
+La principal dificultad del trabajo fue lograr entender cómo funcionaba la biblioteca `ply`. Creemos que hubiera sido más simple nuestro trabajo si hubiéramos contado con una clase introductoria para este tipo de herramientas. Para poder entender un poco más el uso de esta herramienta, primero realizamos una implementación de una gramática simple. Esta genera todas las posibles cadenas con parentesis anidados y balanceados (esto puede observarse en el archivo `parentesis-anidados.py`).
 
 El siguiente conflicto encontrado, como mencionamos anteriormente, es el de encontrar los `tokens` adecuados para utilizar dentro del `lexer` y para definirlo realizamos un proceso iterativo. Basado en esto diseñamos una gramática _left-to-right rightmost derivation_(LR), válidandola con la herramienta ya mencionada [Grammophone](http://mdaines.github.io/grammophone/).
 
@@ -207,4 +207,70 @@ Exception: Parser: Syntax error at '1'
 
 ```
 Exception: numeración no consecutiva
+```
+
+### Ejemplo de corrida 4
+
+**Entrada**
+
+```
+[elias "capo"]
+
+2. 1d7 d7 3. Rf8 gg7 1-0
+```
+
+**Salida**
+
+```
+Exception: la numeración no comienza en 1
+```
+
+### Ejemplo de corrida 5
+
+**Entrada**
+
+```
+[elias "capo"]
+
+1. 1d7 {esto es un comentario.} 2... d7 1-0
+```
+
+**Salida**
+
+```
+Exception: no mantiene numeración entre jugada de negras y blancas
+```
+
+### Ejemplo de corrida 6
+
+**Entrada**
+
+```
+[elias "capo"]
+
+1. 1d7 {esto es un comentario (con un comentario adentro) que luego continúa (e intenta tener otro comentario).} 1... d7 1-0
+```
+
+**Salida**
+
+```
+Exception: Parser: Syntax error at '('
+```
+
+Aclaración: la gramática no permite tener un comentario que contenga dos comentarios al mismo nivel.
+
+### Ejemplo de corrida 7
+
+**Entrada**
+
+```
+[elias "capo"]
+
+1. 1d7 {esto es un comentario (con un comentario adentro xd7) que luego no continúa.} 1... d7 1-0
+```
+
+**Salida**
+
+```
+Máximo nivel de anidamiento: 1
 ```

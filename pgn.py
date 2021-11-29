@@ -255,7 +255,6 @@ def p_jugada_fin(p):
 # B  -> NUM DOT SPACE JUGADA SPACE .
 def p_blancas(p):
     'blanca : NUM DOT SPACE JUGADA SPACE'
-    condition(p[1].isnumeric(), "NUM no es un número")
     p[0] = PGN(0, int(p[1]))
 
 # Ns -> N Cs .
@@ -286,7 +285,6 @@ def p_comentarios(p):
 # N  -> C SPACE NUM DOTS SPACE JUGADA SPACE .
 def p_negra_comentario(p):
     'negra : comentario SPACE NUM DOTS SPACE JUGADA SPACE'
-    condition(p[3].isnumeric(), "NUM no es un número")
     p[0] = PGN(p[1], int(p[3]))
 
 # N  -> JUGADA SPACE .
@@ -380,25 +378,19 @@ def p_error(p):
 parser = yacc.yacc()
 
 # Test it out
-data = '''
-[elias "capo"]
+data = ""
 
-1. 1d7 d7 3. Rf8 gg7 1-0
-'''
+with open('entrada.txt') as f:
+    data = f.read()
 
 # Give the lexer some input
 lexer.input(data)
-
-print("LEXER", end="\n\n")
 
 # Tokenize
 while True:
     tok = lexer.token()
     if not tok: 
         break      # No more input
-    print(f'{tok.type}({tok.value})', end = ' ')
-
-print("\n\nPARSER", end="\n\n")
 
 resultado = parser.parse(data)
-print(resultado)
+print("Máximo nivel de anidamiento:", resultado)
