@@ -117,7 +117,7 @@ El siguiente conflicto encontrado, como mencionamos anteriormente, es el de enco
 
 Finalmente el último desafío a afrontar fue la generación de las reglas semánticas que conforman la gramática de atributos. Para esto, a nivel implementativo, trabajamos con dos estructuras `Comentario` y `PGN` que nos permitieron tener más de un valor almacenado. Además definimos la función `condition`, la cual presenta un comportamiento análogo a la utilizada en la práctica levantando una excepción en el caso de no satisfacer la condición evaluada.
 
-Algo a resaltar sobre los atributos utilizados en las reglas semánticas es que todos son de tipo _sintetizado_, esto indica que la gramática presentada es S-atribuida. Gracias a esto podemos asegurar qye el grafo de dependencias no va a presentar ciclos para ninguna cadena del lenguaje, implicando que todos los atributos van a poder ser calculados.
+Algo a resaltar sobre los atributos utilizados en las reglas semánticas es que todos son de tipo _sintetizado_, esto indica que la gramática presentada es S-atribuida. Gracias a esto podemos asegurar que el grafo de dependencias no va a presentar ciclos para ninguna cadena del lenguaje, implicando que todos los atributos van a poder ser calculados.
 
 Cómo trabajo a futuro podría proponerse un cambio dentro de la gramática que permita garantizar la alternancia entre comentarios que utilizen llaves y parentesis. Esto implicaría el cambio en las producciones utilizadas, agregando así mayor claridad sobre los comentarios utilizados dentro de una jugada. También sería posible obtener una mayor sobre la partida agregando o modificando las reglas semánticas existentes, por ejemplo: "máxima cantidad de jaques por archivo".
 
